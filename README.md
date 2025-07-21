@@ -45,7 +45,6 @@ This application is built with mobile-first principles:
 - **Spacing**: Responsive padding and margins
 - **Safe Areas**: Support for device safe area insets
 
-
 ## 🔧 Getting Started
 
 ### Prerequisites
@@ -178,3 +177,12 @@ This project is built for demonstration purposes. Feel free to use and modify as
 ---
 
 Built with ❤️ using Next.js 14 and modern web technologies.
+
+## Code Style & Collaboration
+
+- **Lint:** `npm run lint` — checks code for errors and style issues.
+- **Format:** `npm run format` — auto-formats code using Prettier.
+- **EditorConfig:** Basic settings for consistent indentation and line endings.
+- **ESLint & Prettier:** Configured to work with TypeScript and React.
+
+> Please run `npm run lint` and `npm run format` before pushing code.
