@@ -43,3 +43,8 @@ next-env.d.ts
 # cursor
 .cursor/**
 .cursor-rules.json
+
+# kiro
+.kiro/**
+/survey-optimization
+COMPREHENSIVE_PROJECT_REPORT.md
