@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Footer from "../components/Footer";
+import Footer from "@/components/Footer";
+import PricingSection from "@/components/PricingSection";
+import { pricingPlans } from "@/const/PricingPlan";
 
 const LandingPage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -99,6 +101,11 @@ const LandingPage = () => {
     }
     setTimeout(typeWriter, 1000);
   }, []);
+
+  const handlePlanSelect = (planName: string) => {
+    console.log(`Selected plan: ${planName}`);
+    // TODO: Add plan selection logic here
+  };
 
   return (
     <main className="overflow-x-hidden bg-slate-50 text-slate-900">
@@ -391,269 +398,13 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Pricing Section  */}
-      <section id="pricing" className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-16 text-center">
-            <h2 className="mb-4 text-4xl font-bold md:text-5xl">Library Management Plans</h2>
-            <p className="mx-auto max-w-3xl text-xl text-slate-600">
-              Choose the perfect plan for your educational institution
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg">
-              <h3 className="mb-4 text-2xl font-bold">Starter</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">$29</span>
-                <span className="text-slate-600">/month</span>
-              </div>
-              <ul className="mb-8 space-y-3">
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Up to 200 students
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  2 admin accounts
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Basic analytics
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Email support
-                </li>
-              </ul>
-              <button className="w-full rounded-full border-2 border-slate-300 px-6 py-3 font-semibold text-slate-700 transition-all duration-300 hover:border-blue-600 hover:text-blue-600">
-                Get Started
-              </button>
-            </div>
-
-            <div className="relative overflow-hidden rounded-2xl bg-blue-600 p-8 text-white shadow-2xl">
-              <div className="absolute top-4 right-4 rounded-full bg-yellow-400 px-3 py-1 text-sm font-semibold text-yellow-900">
-                Popular
-              </div>
-              <h3 className="mb-4 text-2xl font-bold">Professional</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">$79</span>
-                <span className="text-blue-200">/month</span>
-              </div>
-              <ul className="mb-8 space-y-3">
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Up to 1000 students
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  5 admin accounts
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Advanced analytics
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Priority support
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Payment automation
-                </li>
-              </ul>
-              <button className="w-full rounded-full bg-white px-6 py-3 font-semibold text-blue-600 transition-all duration-300 hover:bg-gray-100 hover:shadow-lg">
-                Get Started
-              </button>
-            </div>
-
-            <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-lg">
-              <h3 className="mb-4 text-2xl font-bold">Enterprise</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold">$199</span>
-                <span className="text-slate-600">/month</span>
-              </div>
-              <ul className="mb-8 space-y-3">
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Unlimited students
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Unlimited admins
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Custom integrations
-                </li>
-                <li className="flex items-center">
-                  <svg
-                    className="mr-3 h-5 w-5 text-green-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Dedicated support
-                </li>
-              </ul>
-              <button className="w-full rounded-full border-2 border-slate-300 px-6 py-3 font-semibold text-slate-700 transition-all duration-300 hover:border-blue-600 hover:text-blue-600">
-                Contact Sales
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Pricing Section */}
+      <PricingSection
+        title="Library Management Plans"
+        subtitle="Choose the perfect plan for your educational institution"
+        plans={pricingPlans}
+        onPlanSelect={handlePlanSelect}
+      />
 
       {/* CTA Section  */}
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-20 text-white">
