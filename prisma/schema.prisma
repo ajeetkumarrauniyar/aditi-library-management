@@ -9,43 +9,104 @@ datasource db {
 
 model Tenant {
   id           String   @id @default(uuid())
-  name         String
   slug         String   @unique
+  logo         String?
+  name         String
+  tagline      String?
   address      String?
   email        String?
   phone        String?
   whatsapp     String?
   geo          String?
   openingHours String?
-  tagline      String?
-  rating       Float?
-  totalReviews Int?
-  amenities    String[]
+  rating       Float?   @default(0)
+  totalReviews Int?     @default(0)
+  amenities    String[] @default([])
 
   users User[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@map("tenants")
 }
 
 model User {
-  id               String   @id @default(uuid())
-  username         String   @unique
-  email            String   @unique
-  password         String
-  verifyCode       String
-  verifyCodeExpiry DateTime
-  isVerified       Boolean  @default(false)
-  isAdmin          Boolean  @default(false)
-  isSuperAdmin     Boolean  @default(false)
-  isActive         Boolean  @default(true)
-  isDeleted        Boolean  @default(false)
-  isSuspended      Boolean  @default(false)
-  isBanned         Boolean  @default(false)
+  id String @id @default(uuid())
 
+  // Auth fields
+  username            String?   @unique
+  email               String?   @unique
+  phone               String?
+  password            String?
+  verifyCode          String?
+  verifyCodeExpiresAt DateTime?
+  isEmailVerified     Boolean?  @default(false)
+  isPhoneVerified     Boolean?  @default(false)
+
+  // User status fields
+  isVerified     Boolean? @default(false)
+  isActive       Boolean? @default(true)
+  isDeleted      Boolean? @default(false)
+  isSuspended    Boolean? @default(false)
+  isBanned       Boolean? @default(false)
+  isBannedReason String?
+
+  // Profile fields
+  name   String?
+  avatar String?
+
+  // Address fields
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  state        String?
+  country      String?
+  pincode      String?
+
+  // Roles and permissions fields
+  role          UserRole @default(USER)
+  permissions   String[]
+  isSuperAdmin  Boolean? @default(false)
+  isTenantAdmin Boolean? @default(false) // Tenant admin
+
+  // If user role is (USER || TENANT_STAFF), then these fields are required
+  firstName       String?
+  lastName        String?
+  aadhaarNumber   String?
+  aadhaarVerified Boolean? @default(false)
+
+  // If user role is (USER but not TENANT_STAFF or TENANT_ADMIN), then these fields are required
+
+  // Tenant fields
+  tenantId String?
   tenant   Tenant? @relation(fields: [tenantId], references: [id])
-  tenantId String? @unique
+
+  // User settings fields
+  theme              String?  @default("light")
+  language           String?  @default("en")
+  notification       Boolean? @default(true)
+  emailNotifications Boolean? @default(true)
+  smsNotifications   Boolean? @default(true)
+  emailPreferences   String[] @default([])
+  smsPreferences     String[] @default([])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([role])
+  @@index([phone])
+  @@index([email])
+  @@index([tenantId, email])
+  @@index([tenantId, phone])
+  @@map("users")
+}
+
+enum UserRole {
+  USER
+  TENANT_STAFF
+  TENANT_ADMIN
+  SUPER_ADMIN
 }
