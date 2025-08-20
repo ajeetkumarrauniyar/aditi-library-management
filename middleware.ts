@@ -5,19 +5,49 @@ export function middleware(req: NextRequest) {
    * Handle multi-tenant subdomain routing
    */
   const host = req.headers.get("host") || "";
-  const subdomain = host.split(".")[0];
+  const subdomain = host.split(".")[0].toLowerCase();
+  const url = req.nextUrl.clone();
+  const pathname = url.pathname;
+  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.toLowerCase();
 
-  // Skip middleware for main domain, www, and localhost
-  if (subdomain === "www" || host === "localhost:3000" || subdomain === host) {
+  // Skip middleware for login page
+  if (pathname.startsWith("/login")) {
     return NextResponse.next();
   }
 
-  // For subdomain requests, rewrite to /s/[subdomain] and pass tenant info
-  const url = req.nextUrl.clone();
-  url.pathname = `/s/${subdomain}${url.pathname === "/" ? "" : url.pathname}`;
-  url.searchParams.set("tenant", subdomain);
+  // Skip for apex root, www, localhost, and ngrok
+  if (
+    subdomain === "localhost" ||
+    subdomain === "127.0.0.1" ||
+    host.includes("ngrok-free.app") ||
+    host.includes("ngrok.io") ||
+    host.includes("ngrok.app") ||
+    (root && (subdomain === root || subdomain === `www.${root}`))
+  ) {
+    return NextResponse.next();
+  }
 
-  return NextResponse.rewrite(url);
+  let slug: string | null = null;
+
+  // Dev: subdomain.localhost
+  if (subdomain.endsWith(".localhost")) {
+    slug = subdomain.split(".")[0];
+  }
+  // Prod: subdomain of the configured root domain
+  else if (root && subdomain.endsWith(`.${root}`)) {
+    slug = subdomain.split(".")[0];
+  } else {
+    // Custom domain mapping -> resolve to slug (implement via edge config or cached API)
+    // slug = await getSlugByDomain(baseHost); // middleware must remain edge-safe/non-DB
+  }
+
+  // If we found a tenant, rewrite to /s/[slug] and pass tenant info
+  if (slug) {
+    url.pathname = `/s/${slug}${pathname === "/" ? "" : pathname}`;
+    url.searchParams.set("tenant", slug);
+    return NextResponse.rewrite(url);
+  }
+  return NextResponse.next();
 }
 
 // Only run on relevant paths
