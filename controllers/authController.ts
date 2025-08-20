@@ -1,6 +1,12 @@
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib";
-import { BadRequestError, ConflictError, NotFoundError, successResponse } from "@/lib/apiResponse";
+import { prisma, signJWT } from "@/lib";
+import {
+  badRequestError,
+  conflictError,
+  notFoundError,
+  unauthorizedError,
+  successResponse,
+} from "@/lib/apiResponse";
 import {
   generateVerificationCode,
   generateVerificationCodeExpiry,
@@ -12,6 +18,8 @@ import {
   userRegistrationSchema,
   TenantRegistrationInput,
   tenantRegistrationSchema,
+  LoginInput,
+  loginSchema,
 } from "@/schema";
 
 /**
@@ -23,7 +31,7 @@ export const registerUser = async (body: UserRegistrationInput) => {
   // Validate input using Zod schema
   const validation = userRegistrationSchema.safeParse(body);
   if (!validation.success) {
-    throw new BadRequestError(validation.error.errors[0].message);
+    throw new badRequestError(validation.error.errors[0].message);
   }
 
   const { email, password, firstName, lastName, tenantSlug, phone } = validation.data;
@@ -34,7 +42,7 @@ export const registerUser = async (body: UserRegistrationInput) => {
   });
 
   if (!tenant) {
-    throw new NotFoundError("Organization not found");
+    throw new notFoundError("Organization not found");
   }
 
   // Check if user already exists by email
@@ -43,7 +51,7 @@ export const registerUser = async (body: UserRegistrationInput) => {
   });
 
   if (existingUser) {
-    throw new ConflictError("User with this email already exists");
+    throw new conflictError("User with this email already exists");
   }
 
   // Hash password securely
@@ -104,7 +112,7 @@ export const registerTenant = async (body: TenantRegistrationInput) => {
   // Validate input using Zod schema
   const validation = tenantRegistrationSchema.safeParse(body);
   if (!validation.success) {
-    throw new BadRequestError(validation.error.errors[0].message);
+    throw new badRequestError(validation.error.errors[0].message);
   }
 
   const { name, email, password, firstName, lastName } = validation.data;
@@ -115,7 +123,7 @@ export const registerTenant = async (body: TenantRegistrationInput) => {
   });
 
   if (existingUser) {
-    throw new ConflictError("User with this email already exists");
+    throw new conflictError("User with this email already exists");
   }
 
   // Generate tenant slug from organization name
@@ -130,7 +138,7 @@ export const registerTenant = async (body: TenantRegistrationInput) => {
   });
 
   if (existingTenant) {
-    throw new ConflictError("Organization with this name already exists");
+    throw new conflictError("Organization with this name already exists");
   }
 
   // Hash password securely
@@ -191,6 +199,101 @@ export const registerTenant = async (body: TenantRegistrationInput) => {
       userId: result.user.id,
       slug: result.tenant.slug,
       email: email,
+    },
+  });
+};
+
+/**
+ * Authenticates a user and returns a JWT token.
+ * @param body - The login input data.
+ * @returns A success response with user data and JWT token.
+ */
+export const loginUser = async (body: LoginInput) => {
+  // Validate input using Zod schema
+  const validation = loginSchema.safeParse(body);
+  if (!validation.success) {
+    throw new badRequestError(validation.error.errors[0].message);
+  }
+
+  const { email, password } = validation.data;
+
+  // Find user by email with tenant information
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: {
+      tenant: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  if (!user) {
+    throw new unauthorizedError("Invalid email or password");
+  }
+
+  // Verify password
+  if (!user.password) {
+    throw new unauthorizedError("Invalid email or password");
+  }
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new unauthorizedError("Invalid email or password");
+  }
+
+  // Check if user's email is verified
+  if (!user.isEmailVerified) {
+    throw new unauthorizedError("Please verify your email address before logging in");
+  }
+
+  // Check if user account is active
+  if (!user.isVerified) {
+    throw new unauthorizedError("Your account is not active. Please contact support");
+  }
+
+  // Ensure required fields are present for JWT
+  if (!user.email || !user.tenantId) {
+    throw new unauthorizedError("User data is incomplete. Please contact support");
+  }
+
+  // Generate JWT token
+  const token = await signJWT({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    tenantId: user.tenantId,
+    permissions: user.permissions,
+    isEmailVerified: user.isEmailVerified,
+    isTenantAdmin: user.isTenantAdmin || false,
+  });
+
+  // Update last login timestamp
+  // await prisma.user.update({
+  //   where: { id: user.id },
+  //   data: { lastLoginAt: new Date() },
+  // });
+
+  // Return success response with user data and token
+  return successResponse({
+    message: "Login successful",
+    data: {
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        name: user.name,
+        role: user.role,
+        permissions: user.permissions,
+        isEmailVerified: user.isEmailVerified,
+        isTenantAdmin: user.isTenantAdmin,
+        tenant: user.tenant,
+      },
+      token,
     },
   });
 };

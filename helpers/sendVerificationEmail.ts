@@ -1,4 +1,5 @@
 import resend from "@/lib/resend";
+import { shouldLogOTPToConsole } from "@/lib/utils";
 
 export type VerificationType = "tenant_registration" | "user_registration";
 
@@ -177,13 +178,39 @@ export async function sendVerificationEmail({
 }: SendVerificationEmailParams) {
   try {
     const isTenantRegistration = verificationType === "tenant_registration";
-    const brandName = isTenantRegistration ? platformName : tenantName;
     const subject = isTenantRegistration
       ? `Verify your email - Complete your ${platformName} tenant setup`
       : `Verify your email - ${tenantName}`;
 
+    // Check if we should log OTP to console instead of sending email
+    const shouldLogOTP = shouldLogOTPToConsole();
+
+    if (shouldLogOTP) {
+      // Log OTP to console in development mode
+      // eslint-disable-next-line no-console
+      console.log("\n" + "=".repeat(60));
+      // eslint-disable-next-line no-console
+      console.log("🔐 DEVELOPMENT MODE - OTP VERIFICATION CODE");
+      // eslint-disable-next-line no-console
+      console.log("=".repeat(60));
+      // eslint-disable-next-line no-console
+      console.log(`📧 Email: ${email}`);
+      // eslint-disable-next-line no-console
+      console.log(`👤 Name: ${firstName}`);
+      // eslint-disable-next-line no-console
+      console.log(`🏢 Type: ${verificationType}`);
+      // eslint-disable-next-line no-console
+      console.log(`🔑 OTP CODE: ${verificationCode}`);
+      // eslint-disable-next-line no-console
+      console.log(`⏰ Expires in: ${expirationTime} minutes`);
+      // eslint-disable-next-line no-console
+      console.log("=".repeat(60) + "\n");
+
+      return { success: true, data: { message: "OTP logged to console" } };
+    }
+
     // Use Resend's default sender for development/testing
-    const senderEmail = process.env.RESEND_FROM_EMAIL || "Aditi Library <onboarding@resend.dev>";
+    const senderEmail = process.env.RESEND_FROM_EMAIL || "ITMS Library Management <onboarding@resend.dev>";
 
     // For development, use test email. In production, use the actual user email
     const isDevelopment = process.env.NODE_ENV !== "production";
