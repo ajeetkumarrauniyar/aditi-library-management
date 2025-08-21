@@ -1,5 +1,5 @@
 import { successResponse } from "@/lib/apiResponse";
-import { prisma } from "@/lib";
+import { prisma } from "@/lib/server";
 
 interface HealthStatus {
   status: "healthy" | "unhealthy";

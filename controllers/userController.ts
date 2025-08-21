@@ -1,4 +1,6 @@
-import { prisma, successResponse, errorResponse, TenantValidationResult } from "@/lib";
+import { prisma } from "@/lib/server";
+import { successResponse, errorResponse, notFoundError } from "@/lib";
+import { TenantValidationResult } from "@/types/tenant";
 
 /**
  * Get all users for a specific tenant
@@ -53,7 +55,7 @@ export async function getUserById(userId: string, tenantId: string) {
     });
 
     if (!user) {
-      return errorResponse("User not found", 404);
+      throw new notFoundError("User not found");
     }
 
     return successResponse(user, "User found");
@@ -94,4 +96,3 @@ export function validateTenantAccess(
     tenantId: requestedTenantId,
   };
 }
-

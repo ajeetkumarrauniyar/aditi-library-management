@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { prisma, signJWT } from "@/lib";
+import { prisma, signJWT } from "@/lib/server";
 import {
   badRequestError,
   conflictError,
@@ -208,7 +208,9 @@ export const registerTenant = async (body: TenantRegistrationInput) => {
  * @param body - The login input data.
  * @returns A success response with user data and JWT token.
  */
-export const loginUser = async (body: LoginInput) => {
+
+//TODO: Update this function to login tenant and user
+export const loginTenantAndUser = async (body: LoginInput) => {
   // Validate input using Zod schema
   const validation = loginSchema.safeParse(body);
   if (!validation.success) {
@@ -231,7 +233,13 @@ export const loginUser = async (body: LoginInput) => {
     },
   });
 
+  // Check if user exists
   if (!user) {
+    throw new unauthorizedError("Invalid email or password");
+  }
+
+  // Check if tenant exists
+  if (!user.tenant) {
     throw new unauthorizedError("Invalid email or password");
   }
 
@@ -278,9 +286,8 @@ export const loginUser = async (body: LoginInput) => {
   // });
 
   // Return success response with user data and token
-  return successResponse({
-    message: "Login successful",
-    data: {
+  return successResponse(
+    {
       user: {
         id: user.id,
         email: user.email,
@@ -295,5 +302,6 @@ export const loginUser = async (body: LoginInput) => {
       },
       token,
     },
-  });
+    "Login successful",
+  );
 };

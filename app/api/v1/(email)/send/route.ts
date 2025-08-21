@@ -1,4 +1,4 @@
-import { resend } from "@/lib";
+import { resend } from "@/lib/server";
 import { createElement } from "react";
 import VerificationEmail from "@/components/templates/email/VerificationEmail";
 
