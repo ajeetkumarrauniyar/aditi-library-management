@@ -43,12 +43,20 @@ axiosInstance.interceptors.response.use(
         case 401:
           // Unauthorized - token expired or invalid
           if (typeof window !== "undefined") {
-            localStorage.removeItem("auth_token");
-            // Only redirect if not already on auth pages
+            // Show the error message from API response
+            if (data && typeof data === "object" && "message" in data) {
+              toast.error(data.message as string);
+            } else {
+              toast.error("Authentication failed");
+            }
+
+            // Only remove token and redirect if not on auth pages (token expiry case)
             if (
               !window.location.pathname.includes("/login") &&
-              !window.location.pathname.includes("/register")
+              !window.location.pathname.includes("/register") &&
+              !window.location.pathname.includes("/verify")
             ) {
+              localStorage.removeItem("auth_token");
               window.location.href = "/login";
             }
           }
