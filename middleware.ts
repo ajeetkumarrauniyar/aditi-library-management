@@ -1,66 +1,54 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
-  /**
-   * Handle multi-tenant subdomain routing
-   */
+export async function middleware(req: NextRequest) {
   const host = req.headers.get("host") || "";
-  const subdomain = host.split(".")[0].toLowerCase();
   const url = req.nextUrl.clone();
   const pathname = url.pathname;
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.toLowerCase();
 
-  // Skip middleware for login page
-  if (pathname.startsWith("/login")) {
-    return NextResponse.next();
-  }
+  const isDev = process.env.NODE_ENV === "development";
+  const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.toLowerCase() || "localhost";
 
-  // Skip for apex root, www, localhost, and ngrok
-  if (
-    subdomain === "localhost" ||
-    subdomain === "127.0.0.1" ||
-    host.includes("ngrok-free.app") ||
-    host.includes("ngrok.io") ||
-    host.includes("ngrok.app") ||
-    (root && (subdomain === root || subdomain === `www.${root}`))
-  ) {
-    return NextResponse.next();
-  }
+  // Skip middleware for login, API, static, and image routes (matcher already filters most)
+  if (pathname.startsWith("/login")) return NextResponse.next();
 
-  let slug: string | null = null;
+  // Identify subdomain
+  let subdomain: string | null = null;
 
-  // Dev: subdomain.localhost
-  if (subdomain.endsWith(".localhost")) {
-    slug = subdomain.split(".")[0];
-  }
-  // Prod: subdomain of the configured root domain
-  else if (root && subdomain.endsWith(`.${root}`)) {
-    slug = subdomain.split(".")[0];
+  if (isDev) {
+    // Development: tenant.localhost:3000
+    if (host.includes("localhost")) {
+      const parts = host.split(".");
+      if (parts.length > 1 && parts[0] !== "localhost") {
+        subdomain = parts[0];
+      }
+    }
   } else {
-    // Custom domain mapping -> resolve to slug (implement via edge config or cached API)
-    // slug = await getSlugByDomain(baseHost); // middleware must remain edge-safe/non-DB
+    // Production: tenant.yourdomain.com or custom domains
+    const parts = host.split(".");
+    const isRoot = host === rootDomain || host === `www.${rootDomain}`;
+    const isNgrok =
+      host.includes("ngrok-free.app") || host.includes("ngrok.io") || host.includes("ngrok.app");
+
+    if (!isRoot && !isNgrok && parts.length > 2 && host.endsWith(rootDomain)) {
+      subdomain = parts[0];
+    } else if (!isRoot && !isNgrok && !host.endsWith(rootDomain)) {
+      // Potential custom domain: resolve to tenant slug (edge-safe call)
+      // subdomain = await getSlugByDomain(host); // implement if needed
+    }
   }
 
-  // If we found a tenant, rewrite to /s/[slug] and pass tenant info
-  if (slug) {
-    url.pathname = `/s/${slug}${pathname === "/" ? "" : pathname}`;
-    url.searchParams.set("tenant", slug);
+  // If subdomain found, rewrite to /s/[slug]
+  if (subdomain && !pathname.startsWith("/s/")) {
+    url.pathname = `/s/${subdomain}${pathname === "/" ? "" : pathname}`;
+    url.searchParams.set("tenant", subdomain);
     return NextResponse.rewrite(url);
   }
+
   return NextResponse.next();
 }
 
-// Only run on relevant paths
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public assets
-     */
     "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
