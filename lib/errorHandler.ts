@@ -41,6 +41,7 @@ export function errorHandler(error: unknown, request: NextRequest): NextResponse
   // Generate unique request ID for tracking
   const requestId = crypto.randomUUID();
 
+  // eslint-disable-next-line no-console
   console.error("Error in API route:", {
     requestId,
     url: request.url,

@@ -1,12 +1,24 @@
 import { NextResponse } from "next/server";
 
-export interface ApiResponse<T = unknown> {
+// Base API Response interface
+export interface ApiResponse {
   success: boolean;
   message: string;
-  data?: T;
-  error?: string;
   timestamp: string;
   statusCode?: number;
+}
+
+// Success response with required data
+export interface ApiSuccessResponse<T = unknown> extends ApiResponse {
+  success: true;
+  data: T;
+}
+
+// Error response with optional error details
+export interface ApiErrorResponse extends ApiResponse {
+  success: false;
+  data?: never;
+  error?: string;
 }
 
 export class ApiError extends Error {
@@ -69,7 +81,7 @@ export function successResponse<T>(
   data: T,
   message = "Success",
   statusCode = 200,
-): NextResponse<ApiResponse<T>> {
+): NextResponse<ApiSuccessResponse<T>> {
   return NextResponse.json(
     {
       success: true,
@@ -85,7 +97,7 @@ export function successResponse<T>(
 export function createdResponse<T>(
   data: T,
   message = "Created successfully",
-): NextResponse<ApiResponse<T>> {
+): NextResponse<ApiSuccessResponse<T>> {
   return successResponse(data, message, 201);
 }
 
@@ -98,7 +110,7 @@ export function errorResponse(
   message: string,
   status = 500,
   error?: string,
-): NextResponse<ApiResponse> {
+): NextResponse<ApiErrorResponse> {
   return NextResponse.json(
     {
       success: false,
@@ -111,7 +123,7 @@ export function errorResponse(
   );
 }
 
-export function apiErrorResponse(error: ApiError): NextResponse<ApiResponse> {
+export function apiErrorResponse(error: ApiError): NextResponse<ApiErrorResponse> {
   return errorResponse(
     error.message,
     error.statusCode,
@@ -120,7 +132,7 @@ export function apiErrorResponse(error: ApiError): NextResponse<ApiResponse> {
 }
 
 // Pagination Response
-export interface PaginatedResponse<T> extends ApiResponse<T[]> {
+export interface PaginatedResponse<T> extends ApiSuccessResponse<T[]> {
   pagination: {
     page: number;
     limit: number;

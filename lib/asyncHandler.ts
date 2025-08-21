@@ -6,7 +6,7 @@ import { errorHandler } from "./errorHandler";
 type RouteHandler = (request: NextRequest) => Promise<NextResponse>;
 type RouteHandlerWithParams = (
   request: NextRequest,
-  context: { params: Record<string, string> },
+  context: { params: Promise<Record<string, string>> },
 ) => Promise<NextResponse>;
 
 type RequestBody = Record<string, string | number | boolean | null | undefined>;
@@ -18,7 +18,7 @@ export function asyncHandler(
 ): RouteHandler | RouteHandlerWithParams {
   return async (
     request: NextRequest,
-    context?: { params: Record<string, string> },
+    context?: { params: Promise<Record<string, string>> },
   ): Promise<NextResponse> => {
     try {
       if (context) {

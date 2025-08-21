@@ -1,4 +1,4 @@
-import resend from "@/lib/resend";
+import { resend } from "@/lib/server";
 import { shouldLogOTPToConsole } from "@/lib/utils";
 
 export type VerificationType = "tenant_registration" | "user_registration";
@@ -210,7 +210,8 @@ export async function sendVerificationEmail({
     }
 
     // Use Resend's default sender for development/testing
-    const senderEmail = process.env.RESEND_FROM_EMAIL || "ITMS Library Management <onboarding@resend.dev>";
+    const senderEmail =
+      process.env.RESEND_FROM_EMAIL || "ITMS Library Management <onboarding@resend.dev>";
 
     // For development, use test email. In production, use the actual user email
     const isDevelopment = process.env.NODE_ENV !== "production";
