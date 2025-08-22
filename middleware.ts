@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
   const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.toLowerCase() || "localhost";
 
   // Skip middleware for login, API, static, and image routes (matcher already filters most)
-  if (pathname.startsWith("/login")) return NextResponse.next();
+  // if (pathname.startsWith("/login")) return NextResponse.next();
 
   // Identify subdomain
   let subdomain: string | null = null;
@@ -52,6 +52,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)).*)",
   ],
 };

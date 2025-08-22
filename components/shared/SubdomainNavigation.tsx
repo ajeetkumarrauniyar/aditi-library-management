@@ -55,13 +55,13 @@ export function SubdomainNavigation({ subdomain }: SubdomainNavigationProps) {
         className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         asChild
       >
-        <Link href={`/s/${subdomain}/apply`}>Register</Link>
+        <Link href={"/apply"}>Register</Link>
       </Button>
       <Button
         className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
         asChild
       >
-        <Link href={`/s/${subdomain}/login`}>Login</Link>
+        <Link href={"/login"}>Login</Link>
       </Button>
     </div>
   );
