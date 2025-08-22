@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import { Button, Input, Label } from "@/components/index";
 import { apiPost, ApiSuccessResponse } from "@/lib";
 import { User } from "@/types/user";
+import { useAuth } from "@/hooks/useAuth";
+import { performRoleBasedRedirect } from "@/lib/roleRedirect";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,6 +27,7 @@ interface LoginFormProps {
 export function LoginForm({ onSuccess, redirectUrl }: LoginFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
 
   const {
     register,
@@ -43,61 +46,30 @@ export function LoginForm({ onSuccess, redirectUrl }: LoginFormProps) {
         data,
       );
 
-      // Store token
+      // Store token and update auth state
       if (result.data) {
         localStorage.setItem("auth_token", result.data.token);
+        // Update auth state using the useAuth hook
+        login(result.data);
         toast.success("Login successful! Redirecting...");
-
-        // Build tenant-aware redirect
-        const slug = result.data.user?.tenant?.slug;
-        // const role = result.data?.user?.role; // use if you want different paths per role
-
-        if (!slug) {
-          toast.error("Tenant not found. Please contact support.");
-          return;
-        }
-
-        const { protocol, host, port } = window.location;
-        const isLocal =
-          host.includes("localhost") || host.includes("127.0.0.1") || host.includes("ngrok");
-
-        const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN; // e.g. example.com
-        let dest: string;
-
-        if (isLocal || !rootDomain) {
-          // Dev/local: subdomain-based tenant routing (e.g. http://abc-pvt-ltd.localhost:3000/dashboard)
-          // Remove port from host if present (e.g. "localhost:3000" -> "localhost")
-          const baseHost = host.split(":")[0];
-          const portPart = port ? `:${port}` : "";
-
-          // Check if already on the correct subdomain
-          // e.g. host: "abc-pvt-ltd.localhost:3000", slug: "abc-pvt-ltd"
-          // If so, just redirect to /dashboard on current origin
-          if (
-            baseHost.startsWith(`${slug}.`) ||
-            baseHost === `${slug}` // edge case: just the slug as host
-          ) {
-            dest = `${protocol}//${host}/dashboard`;
-          } else {
-            dest = `${protocol}//${slug}.${baseHost}${portPart}/dashboard`;
-          }
-        } else {
-          // Prod: subdomain-based tenant routing
-          // Check if already on the correct subdomain
-          // e.g. host: "abc-pvt-ltd.example.com", slug: "abc-pvt-ltd"
-          if (host.startsWith(`${slug}.`)) {
-            dest = `${protocol}//${host}/dashboard`;
-          } else {
-            dest = `${protocol}//${slug}.${rootDomain}/dashboard`;
-          }
-        }
 
         // Success callback first (optional)
         onSuccess?.(result.data);
 
         // Small delay to ensure toast is visible before redirect
         setTimeout(() => {
-          window.location.href = redirectUrl ?? dest;
+          if (redirectUrl) {
+            window.location.href = redirectUrl;
+          } else {
+            // Use role-based redirect utility
+            try {
+              performRoleBasedRedirect(result.data.user);
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error("Role-based redirect failed:", error);
+              toast.error("Redirect failed. Please contact support.");
+            }
+          }
         }, 1000);
       }
     } catch (error) {

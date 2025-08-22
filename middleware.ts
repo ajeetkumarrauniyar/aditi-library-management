@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
     // Development: tenant.localhost:3000
     if (host.includes("localhost")) {
       const parts = host.split(".");
-      if (parts.length > 1 && parts[0] !== "localhost") {
+      if (parts.length > 1 && parts[0] !== "localhost" && parts[0] !== "www") {
         subdomain = parts[0];
       }
     }
@@ -30,10 +30,13 @@ export async function middleware(req: NextRequest) {
       host.includes("ngrok-free.app") || host.includes("ngrok.io") || host.includes("ngrok.app");
 
     if (!isRoot && !isNgrok && parts.length > 2 && host.endsWith(rootDomain)) {
-      subdomain = parts[0];
+      // Don't treat 'www' as a tenant subdomain
+      if (parts[0] !== "www") {
+        subdomain = parts[0];
+      }
     } else if (!isRoot && !isNgrok && !host.endsWith(rootDomain)) {
       // Potential custom domain: resolve to tenant slug (edge-safe call)
-      // subdomain = await getSlugByDomain(host); // implement if needed
+      // subdomain = await getSlugByDomain(host); //TODO: implement if needed
     }
   }
 

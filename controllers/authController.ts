@@ -187,8 +187,8 @@ export const registerTenant = async (body: TenantRegistrationInput) => {
       verificationCode,
     });
   } catch (emailError) {
+    // eslint-disable-next-line no-console
     console.error("Failed to send verification email:", emailError);
-    // Don't fail the registration if email fails
   }
 
   // Return success response with tenant and user IDs
@@ -301,6 +301,11 @@ export const loginTenantAndUser = async (body: LoginInput) => {
         tenant: user.tenant,
       },
       token,
+      redirectInfo: {
+        role: user.role,
+        tenantSlug: user.tenant?.slug,
+        shouldRedirect: true,
+      },
     },
     "Login successful",
   );

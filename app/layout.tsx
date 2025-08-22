@@ -43,7 +43,7 @@ export default function RootLayout({
       <body className="font-inter bg-gray-50 text-gray-900 antialiased" suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
-          <Toaster position="top-right" richColors closeButton />
+          <Toaster position="top-right" closeButton />
         </ThemeProvider>
       </body>
     </html>
