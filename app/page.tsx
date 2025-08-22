@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import Footer from "@/components/Footer";
-import PricingSection from "@/components/PricingSection";
-import { pricingPlans } from "@/const/PricingPlan";
+import { Footer, PricingSection, Input, Button } from "@/components/index";
+import { AuthAwareNavigation } from "@/components/shared/AuthAwareNavigation";
+import { AuthAwareHeroButtons } from "@/components/shared/AuthAwareHeroButtons";
+import { faqData, pricingPlans, pricingPlans2, pricingPlans3, testimonials } from "@/const";
+import { Award, BookOpen, Star, Users, Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const LandingPage = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navRef = useRef<HTMLElement>(null);
 
+  // Smooth scrolling for navigation links
   useEffect(() => {
-    // Smooth scrolling for navigation links
     const handleAnchorClick = (e: Event) => {
       const anchor = e.currentTarget as HTMLAnchorElement;
       const href = anchor.getAttribute("href");
@@ -103,6 +106,7 @@ const LandingPage = () => {
   }, []);
 
   const handlePlanSelect = (planName: string) => {
+    // eslint-disable-next-line no-console
     console.log(`Selected plan: ${planName}`);
     // TODO: Add plan selection logic here
   };
@@ -114,12 +118,21 @@ const LandingPage = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
+              <div className="flex items-center space-x-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg">
+                  <BookOpen className="h-6 w-6 text-white" />
+                </div>
                 <h1 className="gradient-text text-2xl font-bold">ITMS</h1>
               </div>
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-8">
+                <a
+                  href="#about"
+                  className="px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:text-blue-600"
+                >
+                  About
+                </a>
                 <a
                   href="#features"
                   className="px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:text-blue-600"
@@ -133,17 +146,13 @@ const LandingPage = () => {
                   Pricing
                 </a>
                 <a
-                  href="#about"
+                  href="#contact"
                   className="px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:text-blue-600"
                 >
-                  About
+                  Contact
                 </a>
-                <button className="rounded-full bg-blue-600 px-6 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-blue-700 hover:shadow-lg">
-                  Start Free Trial
-                </button>
-                <button className="rounded-full bg-cyan-600 px-6 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-cyan-700 hover:shadow-lg">
-                  Login
-                </button>
+
+                <AuthAwareNavigation isMainLanding={true} />
               </div>
             </div>
             <div className="md:hidden">
@@ -188,9 +197,7 @@ const LandingPage = () => {
               About
             </a>
             <div className="px-3 py-2">
-              <button className="w-full rounded-full bg-cyan-600 px-6 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-cyan-700 hover:shadow-lg">
-                Login
-              </button>
+              <AuthAwareNavigation isMainLanding={true} />
             </div>
           </div>
         </div>
@@ -215,14 +222,7 @@ const LandingPage = () => {
             Streamline student management, automate payments, and enhance learning experiences with
             our comprehensive SaaS platform designed for educational institutions.
           </p>
-          <div className="animate-slide-up flex flex-col justify-center gap-4 sm:flex-row">
-            <button className="animate-pulse-glow rounded-full bg-blue-600 px-8 py-4 text-lg font-semibold text-white transition-all duration-300 hover:scale-105 hover:bg-blue-700 hover:shadow-2xl">
-              Start Free Trial
-            </button>
-            <button className="rounded-full border-2 border-slate-300 px-8 py-4 text-lg font-semibold text-slate-700 transition-all duration-300 hover:border-blue-600 hover:text-blue-600 hover:shadow-lg">
-              Schedule Demo
-            </button>
-          </div>
+          <AuthAwareHeroButtons isMainLanding={true} />
         </div>
 
         {/* Scroll indicator */}
@@ -248,15 +248,17 @@ const LandingPage = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-4xl font-bold md:text-5xl">
-              Comprehensive Library Management
+              Everything you need to <span className="gradient-text">manage your library</span>
             </h2>
             <p className="mx-auto max-w-3xl text-xl text-slate-600">
               Everything you need to streamline your library operations and enhance student
-              experiences
+              experiences. From student admissions to payment processing, we&apos;ve got every
+              aspect covered.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {/* Student Management */}
             <div className="feature-card rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100">
                 <svg
@@ -280,6 +282,7 @@ const LandingPage = () => {
               </p>
             </div>
 
+            {/* Smart Admissions */}
             <div className="feature-card rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-100">
                 <svg
@@ -303,6 +306,37 @@ const LandingPage = () => {
               </p>
             </div>
 
+            {/* Book Inventory & Circulation */}
+            <div className="feature-card rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-yellow-100">
+                <svg
+                  className="h-8 w-8 text-yellow-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <rect x="4" y="4" width="16" height="16" rx="2" strokeWidth="2" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M8 4v16M16 4v16"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-4 text-xl font-semibold">Book Inventory &amp; Circulation</h3>
+              <p className="text-slate-600">
+                Effortlessly manage book cataloging, check-in/check-out, reservations, and overdue
+                tracking with barcode and RFID support.
+              </p>
+              <div className="absolute top-6 right-6">
+                <span className="inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-600">
+                  Upcoming
+                </span>
+              </div>
+            </div>
+
+            {/* Payment Automation */}
             <div className="feature-card rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-purple-100">
                 <svg
@@ -326,6 +360,7 @@ const LandingPage = () => {
               </p>
             </div>
 
+            {/* Intelligent Notifications */}
             <div className="feature-card rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-100">
                 <svg
@@ -344,11 +379,42 @@ const LandingPage = () => {
               </div>
               <h3 className="mb-4 text-xl font-semibold">Intelligent Notifications</h3>
               <p className="text-slate-600">
-                Real-time alerts for payments, announcements, and system updates to keep everyone
-                informed and engaged.
+                Automated SMS and email alerts for admissions, payments, and announcements to keep
+                everyone informed and engaged.
               </p>
             </div>
 
+            {/* Multi-Location Support */}
+            <div className="feature-card relative rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-cyan-50">
+                <svg
+                  className="h-8 w-8 text-cyan-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="12" cy="12" r="10" strokeWidth="2" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M2 16.5S6 12 12 12s10 4.5 10 4.5M12 12V2"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-4 text-xl font-semibold">Multi-Location Support</h3>
+              <p className="text-slate-600">
+                Manage multiple library branches from a single dashboard with centralized reporting
+                and decentralized operations.
+              </p>
+              <div className="absolute top-6 right-6">
+                <span className="inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-600">
+                  Upcoming
+                </span>
+              </div>
+            </div>
+
+            {/* Analytics Dashboard */}
             <div className="feature-card rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-100">
                 <svg
@@ -365,13 +431,39 @@ const LandingPage = () => {
                   />
                 </svg>
               </div>
-              <h3 className="mb-4 text-xl font-semibold">Analytics Dashboard</h3>
+              <h3 className="mb-4 text-xl font-semibold">Real-time Analytics</h3>
               <p className="text-slate-600">
                 Comprehensive insights into student enrollment, revenue, retention rates, and
                 operational metrics for data-driven decisions.
               </p>
             </div>
 
+            {/* Secure & Compliant Feature */}
+            <div className="feature-card rounded-2xl border border-red-200 bg-red-50 p-8 shadow-lg transition-all duration-300 hover:border-red-400">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-100">
+                {/* Shield icon */}
+                <svg
+                  className="h-8 w-8 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 3l8 4v5c0 5.25-3.5 10-8 12-4.5-2-8-6.75-8-12V7l8-4z"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-4 text-xl font-semibold">Secure &amp; Compliant</h3>
+              <p className="text-slate-600">
+                Bank-grade security with Aadhaar verification, data protection compliance, and
+                encrypted payment processing.
+              </p>
+            </div>
+
+            {/* Mobile-First Experience */}
             <div className="feature-card rounded-2xl border border-slate-100 bg-white p-8 shadow-lg transition-all duration-300 hover:border-blue-200">
               <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-100">
                 <svg
@@ -394,17 +486,155 @@ const LandingPage = () => {
                 seamless library staff workflows.
               </p>
             </div>
+
+            {/* Cloud Infrastructure Feature */}
+            <div className="feature-card rounded-2xl border border-violet-200 bg-white p-8 shadow-lg transition-all duration-300 hover:border-violet-400">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-violet-50">
+                <svg
+                  className="h-8 w-8 text-violet-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <rect x="3" y="7" width="18" height="13" rx="2" strokeWidth="2" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M16 3v4M8 3v4M3 11h18"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-4 text-xl font-semibold">Cloud Infrastructure</h3>
+              <p className="text-slate-600">
+                Scalable cloud infrastructure with automatic backups, 99.9% uptime guarantee, and
+                enterprise-grade performance.
+              </p>
+            </div>
+
+            {/* Mobile App Upcoming Feature */}
+            <div className="feature-card relative rounded-2xl border border-indigo-200 bg-white p-8 shadow-lg transition-all duration-300 hover:border-indigo-400">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-50">
+                <svg
+                  className="h-8 w-8 text-indigo-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <rect x="7" y="2" width="10" height="20" rx="3" strokeWidth="2" />
+                  <circle cx="12" cy="18" r="1" strokeWidth="2" />
+                </svg>
+              </div>
+              <div className="absolute top-6 right-6">
+                <span className="inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-600">
+                  Upcoming
+                </span>
+              </div>
+              <h3 className="mb-4 text-xl font-semibold">Mobile App</h3>
+              <p className="text-slate-600">
+                Native mobile apps for iOS and Android with offline capabilities, push
+                notifications, and seamless user experience.
+              </p>
+            </div>
+
+            {/* AI-Powered Search */}
+            <div className="feature-card rounded-2xl border border-emerald-200 bg-emerald-50 p-8 shadow-lg transition-all duration-300 hover:border-emerald-400">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
+                <svg
+                  className="h-8 w-8 text-emerald-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <circle cx="11" cy="11" r="7" strokeWidth="2" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M21 21l-4.35-4.35"
+                  />
+                </svg>
+              </div>
+              <h3 className="mb-4 text-xl font-semibold">AI-Powered Search</h3>
+              <p className="text-slate-600">
+                Instantly find books, resources, and student records with intelligent, context-aware
+                search and recommendations.
+              </p>
+              <div className="absolute top-6 right-6">
+                <span className="inline-block rounded-full bg-indigo-100 px-3 py-1 text-xs font-semibold text-indigo-600">
+                  Upcoming
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="mt-20 text-center">
+            <div className="inline-flex items-center space-x-2 text-lg font-semibold text-blue-600">
+              <Award className="h-6 w-6" />
+              <span>Trusted by 500+ Libraries Across India</span>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Pricing Section */}
       <PricingSection
-        title="Library Management Plans"
-        subtitle="Choose the perfect plan for your educational institution"
+        title="Simple, Transparent Pricing"
+        subtitle="Choose the perfect plan for your educational institution | Choose the plan that fits your library's needs"
         plans={pricingPlans}
         onPlanSelect={handlePlanSelect}
       />
+      <PricingSection
+        title="Library Management Plans"
+        subtitle="Choose the perfect plan for your educational institution"
+        plans={pricingPlans2}
+        onPlanSelect={handlePlanSelect}
+      />
+      <PricingSection
+        title="Library Management Plans"
+        subtitle="Choose the perfect plan for your educational institution"
+        plans={pricingPlans3}
+        onPlanSelect={handlePlanSelect}
+      />
+      {/* Testimonials Section */}
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-bold text-gray-900">
+              What library owners say about us
+            </h2>
+            <p className="text-xl text-gray-600">
+              Join thousands of successful library owners across India
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            {testimonials.map((testimonial, index) => (
+              <Card key={index} className="border-0 shadow-lg">
+                <CardHeader>
+                  <div className="mb-4 flex items-center space-x-1">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-current text-yellow-400" />
+                    ))}
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="mb-6 text-gray-600">&quot;{testimonial.content}&quot;</p>
+                  <div className="flex items-center space-x-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                      <Users className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                      <div className="text-sm text-gray-600">{testimonial.role}</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section  */}
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 py-20 text-white">
@@ -414,17 +644,87 @@ const LandingPage = () => {
             Join hundreds of educational institutions already modernizing their library management
             with ITMS.
           </p>
-          <div className="flex flex-col justify-center gap-4 sm:flex-row">
-            <button className="rounded-full bg-white px-8 py-4 text-lg font-semibold text-blue-600 transition-all duration-300 hover:scale-105 hover:bg-gray-100 hover:shadow-2xl">
-              Start Your Free Trial
-            </button>
-            <button className="rounded-full border-2 border-white px-8 py-4 text-lg font-semibold text-white transition-all duration-300 hover:bg-white hover:text-blue-600">
-              Schedule a Demo
-            </button>
+          <AuthAwareHeroButtons isMainLanding={true} />
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-16 text-center">
+            <h2 className="mb-4 text-4xl font-bold text-gray-900">Frequently Asked Questions</h2>
+            <p className="text-xl text-gray-600">
+              Everything you need to know about our library management system
+            </p>
+          </div>
+          <div className="space-y-6">
+            {faqData.map((faq, index) => (
+              <Card key={index} className="border-0 shadow-md">
+                <CardHeader>
+                  <CardTitle className="text-lg">{faq.question}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-gray-600">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* Contact Section */}
+      <section id="contact" className="bg-white py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid gap-12 lg:grid-cols-2">
+            <div>
+              <h2 className="mb-6 text-4xl font-bold text-gray-900">Ready to Get Started?</h2>
+              <p className="mb-8 text-xl text-gray-600">
+                Join hundreds of libraries already using StudyHub to streamline their operations and
+                delight their students.
+              </p>
+
+              <div className="space-y-4">
+                {[
+                  { icon: Phone, text: "+91 98765 43210" },
+                  { icon: Mail, text: "hello@studyhub.in" },
+                  { icon: MapPin, text: "Mumbai, Maharashtra, India" },
+                ].map((contact, index) => (
+                  <div key={index} className="flex items-center">
+                    <contact.icon className="mr-3 h-5 w-5 text-blue-600" />
+                    <span className="text-gray-600">{contact.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Card className="p-8 shadow-lg">
+              <CardContent className="p-0">
+                <h3 className="mb-6 text-2xl font-semibold text-gray-900">Get a Free Demo</h3>
+
+                <form className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <Input placeholder="First Name" />
+                    <Input placeholder="Last Name" />
+                  </div>
+                  <Input placeholder="Email Address" type="email" />
+                  <Input placeholder="Phone Number" />
+                  <Input placeholder="Library Name" />
+                  <textarea
+                    className="w-full rounded-md border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    rows={4}
+                    placeholder="Tell us about your requirements..."
+                  />
+
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700" size="lg">
+                    Schedule Demo
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
       {/* Footer */}
       <Footer />
     </main>
