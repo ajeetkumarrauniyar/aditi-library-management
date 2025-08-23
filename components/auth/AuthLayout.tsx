@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface AuthLayoutProps {
   children: ReactNode;
-  title: string;
+  title: ReactNode;
   description?: string;
   footerLinks?: {
     text: string;

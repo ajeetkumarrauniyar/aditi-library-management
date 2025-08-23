@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { apiGet, apiPost, ApiSuccessResponse } from "@/lib";
 import { User, AuthState } from "@/types";
+import { toast } from "sonner";
 
 export function useAuth() {
   const [authState, setAuthState] = useState<AuthState>({
@@ -63,9 +64,11 @@ export function useAuth() {
       if (token) {
         await apiPost("/logout");
       }
+      toast.success("Logged out successfully");
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Logout error:", error);
+      // Error toast handled by axios interceptor if applicable
     } finally {
       localStorage.removeItem("auth_token");
       setAuthState({
