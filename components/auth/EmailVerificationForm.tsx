@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { apiPost, ApiSuccessResponse } from "@/lib";
 import { toast } from "sonner";
 
 const verificationSchema = z.object({
@@ -52,24 +53,21 @@ export function EmailVerificationForm({
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/v1/verify-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Verification failed");
-      }
+      const result = await apiPost<
+        ApiSuccessResponse<{
+          userId: string;
+          tenantId: string;
+          tenantSlug: string;
+          role: string;
+        }>
+      >("/verify-email", data);
 
       toast.success("Email verified successfully!");
       onSuccess?.(result.data);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Verification failed");
+      // Error handling is done by axios interceptor
+      // eslint-disable-next-line no-console
+      console.error("Verification error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,23 +84,12 @@ export function EmailVerificationForm({
     setIsResending(true);
 
     try {
-      const response = await fetch("/api/v1/resend-verification", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: emailValue }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Failed to resend code");
-      }
-
+      await apiPost<ApiSuccessResponse<unknown>>("/resend-verification", { email: emailValue });
       toast.success("Verification code sent to your email!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to resend code");
+      // Error handling is done by axios interceptor
+      // eslint-disable-next-line no-console
+      console.error("Resend verification error:", error);
     } finally {
       setIsResending(false);
     }

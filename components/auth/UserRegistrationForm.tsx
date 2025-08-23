@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { apiPost, ApiSuccessResponse } from "@/lib";
 import { toast } from "sonner";
 
 const userRegistrationSchema = z
@@ -54,30 +55,26 @@ export function UserRegistrationForm({
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/v1/user-register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+      const result = await apiPost<ApiSuccessResponse<{ userId: string; tenantId: string }>>(
+        "/user-register",
+        {
           ...data,
           tenantSlug,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.message || "Registration failed");
-      }
+        },
+      );
 
       toast.success("Registration successful! Please check your email for verification code.");
-      onSuccess?.({
-        ...result.data,
-        email: data.email,
-      });
+      if (result.data) {
+        onSuccess?.({
+          userId: result.data.userId,
+          tenantId: result.data.tenantId,
+          email: data.email,
+        });
+      }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Registration failed");
+      // Error handling is done by axios interceptor
+      // eslint-disable-next-line no-console
+      console.error("Registration error:", error);
     } finally {
       setIsLoading(false);
     }

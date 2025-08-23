@@ -7,6 +7,8 @@ import { z } from "zod";
 import { Loader2, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button, Input, Label } from "@/components/index";
+import { apiPost, ApiSuccessResponse } from "@/lib";
+import { AxiosError } from "axios";
 import { toast } from "sonner";
 
 const tenantRegistrationSchema = z.object({
@@ -47,19 +49,32 @@ export function TenantRegistrationForm({
     clearErrors();
 
     try {
-      const response = await fetch("/api/v1/tenant-register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const result = await apiPost<
+        ApiSuccessResponse<{ tenantId: string; userId: string; slug: string }>
+      >("/tenant-register", data);
 
-      const result = await response.json();
+      toast.success(
+        "Organization registered successfully! Please check your email for verification code.",
+      );
+      if (result.data) {
+        onSuccess?.({
+          tenantId: result.data.tenantId,
+          userId: result.data.userId,
+          slug: result.data.slug,
+          email: data.email,
+        });
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Registration error:", error);
 
-      if (!response.ok) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response) {
+        const { status, data: responseData } = axiosError.response;
+        const result = responseData as { message?: string; errors?: Record<string, string> };
+
         // Handle specific API errors
-        if (response.status === 409) {
+        if (status === 409) {
           if (result.message?.includes("email")) {
             // Email already exists
             setError("email", {
@@ -76,38 +91,23 @@ export function TenantRegistrationForm({
                 "An organization with this name already exists. Please choose a different name.",
             });
             setApiErrors({ name: result.message });
-          } else {
-            throw new Error(result.message || "Registration failed");
           }
-        } else if (response.status === 400) {
+        } else if (status === 400) {
           // Handle validation errors from server
           if (result.errors) {
             Object.keys(result.errors).forEach((field) => {
-              setError(field as keyof TenantRegistrationData, {
-                type: "manual",
-                message: result.errors[field],
-              });
+              const errorMessage = result.errors?.[field];
+              if (errorMessage) {
+                setError(field as keyof TenantRegistrationData, {
+                  type: "manual",
+                  message: errorMessage,
+                });
+              }
             });
-          } else {
-            throw new Error(result.message || "Registration failed");
           }
-        } else {
-          throw new Error(result.message || "Registration failed");
         }
-        return;
       }
-
-      toast.success(
-        "Organization registered successfully! Please check your email for verification code.",
-      );
-      onSuccess?.({
-        ...result.data,
-        email: data.email,
-      });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Registration error:", error);
-      toast.error(error instanceof Error ? error.message : "Registration failed");
+      // General error toast is handled by axios interceptor
     } finally {
       setIsLoading(false);
     }
