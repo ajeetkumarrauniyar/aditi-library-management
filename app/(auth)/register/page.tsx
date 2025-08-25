@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { EmailVerificationForm, TenantRegistrationForm, AuthLayout } from "@/components/index";
+import { getSubdomainFromHostname } from "@/lib";
 
 interface RegistrationSuccessData {
   tenantId: string;
@@ -26,29 +27,31 @@ export default function Register() {
     setStep("verify");
   };
 
+  /**
+   * Handle successful email verification
+   *
+   * After email verification, redirect the user to their tenant's dashboard.
+   * This function constructs the correct tenant subdomain URL based on the
+   * current environment and the user's tenant slug.
+   *
+   * @param data - Verification success data containing tenant information
+   */
   const handleVerificationSuccess = (data: VerificationSuccessData) => {
-    // Redirect to tenant subdomain dashboard
+    // Get current host and protocol for URL construction
     const currentHost = window.location.host;
     const protocol = window.location.protocol;
+    const rootDomain = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
 
-    // Handle localhost and production domains differently
-    let tenantUrl: string;
+    // Get current subdomain to determine base host
+    const currentSubdomain = getSubdomainFromHostname(currentHost, rootDomain);
+    const baseHost = currentSubdomain
+      ? currentHost.replace(`${currentSubdomain}.`, "")
+      : currentHost;
 
-    if (currentHost.includes("localhost")) {
-      // For localhost development: tenant-slug.localhost:3000
-      tenantUrl = `${protocol}//${data.tenantSlug}.localhost:3000/dashboard`;
-    } else {
-      // For production: tenant-slug.yourdomain.com
-      const baseHost = currentHost.includes(".")
-        ? currentHost.replace(/^[^.]+\./, "") // Remove existing subdomain
-        : currentHost; // No subdomain exists
-      tenantUrl = `${protocol}//${data.tenantSlug}.${baseHost}/dashboard`;
-    }
+    const tenantUrl = `${protocol}//${data.tenantSlug}.${baseHost}/dashboard`;
 
     // eslint-disable-next-line no-console
     console.log(`Redirecting to tenant dashboard: ${tenantUrl}`);
-
-    // Use window.location for cross-subdomain navigation
     window.location.href = tenantUrl;
   };
 

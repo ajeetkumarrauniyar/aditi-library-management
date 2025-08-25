@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { toast } from "sonner";
+import { getSubdomainFromHostname } from "./tenant";
 
 // Create axios instance with base configuration
 const axiosInstance = axios.create({
@@ -10,7 +11,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add authentication token
+// Request interceptor to add authentication token and tenant information
 axiosInstance.interceptors.request.use(
   (config) => {
     // Add authentication token if available
@@ -18,6 +19,39 @@ axiosInstance.interceptors.request.use(
       const token = localStorage.getItem("auth_token");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      // Derive tenant slug and set x-tenant-id header for multi-tenant API calls
+      try {
+        const host = window.location.host.toLowerCase();
+        const pathname = window.location.pathname || "/";
+        const rootDomain = (process.env.NEXT_PUBLIC_ROOT_DOMAIN || "").toLowerCase();
+
+        let tenantSlug: string | null = null;
+
+        // Strategy 1: Prefer pathname-based tenant identification
+        // This works when middleware has already processed the request
+        // and rewritten the URL to /s/[slug]/...
+        if (pathname.startsWith("/s/")) {
+          const parts = pathname.split("/").filter(Boolean); // ["s","slug",...]
+          if (parts.length >= 2) {
+            tenantSlug = parts[1]; // Extract tenant slug from path
+          }
+        }
+
+        // Strategy 2: Fallback to subdomain-based tenant identification
+        // This works for direct subdomain access (e.g., tenant.example.com)
+        if (!tenantSlug) {
+          tenantSlug = getSubdomainFromHostname(host, rootDomain);
+        }
+
+        // Set tenant header for API requests if tenant identified
+        if (tenantSlug) {
+          (config.headers as Record<string, string>)["x-tenant-id"] = tenantSlug;
+        }
+      } catch {
+        // Silently fail if tenant identification fails
+        // This ensures API calls still work even if tenant detection fails
       }
     }
     return config;
