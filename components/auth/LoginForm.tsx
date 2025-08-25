@@ -10,7 +10,7 @@ import { Button, Input, Label } from "@/components/index";
 import { apiPost, ApiSuccessResponse } from "@/lib";
 import { User } from "@/types/user";
 import { useAuth } from "@/hooks/useAuth";
-import { performRoleBasedRedirect } from "@/lib/roleRedirect";
+import { performRoleBasedRedirect } from "@/lib/tenant/roleRedirect";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),

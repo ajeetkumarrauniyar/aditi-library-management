@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
-import { asyncHandler} from "@/lib";
-import { prisma } from "@/lib/prisma";
-import { badRequestError, notFoundError, successResponse } from "@/lib/apiResponse";
+import { asyncHandler } from "@/lib";
+import { prisma } from "@/lib/database/prisma";
+import { badRequestError, notFoundError, successResponse } from "@/lib/http/apiResponse";
 import { isVerificationCodeExpired } from "@/helpers";
 import { z } from "zod";
 

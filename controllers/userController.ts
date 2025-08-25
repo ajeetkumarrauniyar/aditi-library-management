@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/server";
-import { successResponse, errorResponse, notFoundError } from "@/lib";
+import { prisma } from "@/lib/database";
+import { successResponse, errorResponse, notFoundError } from "@/lib/http/apiResponse";
 import { TenantValidationResult } from "@/types/tenant";
 
 /**

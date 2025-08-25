@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ApiError } from "./apiResponse";
+import { ApiError } from "../http/apiResponse";
 import { errorHandler } from "./errorHandler";
 
 // Route handler type

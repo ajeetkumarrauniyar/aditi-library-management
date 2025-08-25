@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { toast } from "sonner";
-import { getSubdomainFromHostname } from "./tenant";
+import { getSubdomainFromHostname } from "../tenant/client";
 
 // Create axios instance with base configuration
 const axiosInstance = axios.create({

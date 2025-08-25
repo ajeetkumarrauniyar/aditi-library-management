@@ -1,18 +1,15 @@
-// Re-export everything
+/**
+ * Multi-tenant utilities
+ *
+ * This module contains utilities for handling multi-tenant functionality
+ * including subdomain detection, tenant routing, and redirect logic.
+ */
+
+// Client-side exports
 export * from "./client";
-export * from "./server";
+export * from "./redirect";
+
+// Re-export types
 export * from "@/types/tenant";
 
-// Main exports for easy importing
-export {
-  // Frontend (Public Pages)
-  getTenantBySubdomain,
-  getTenantIdFromSearchParams,
-} from "./client";
-
-export {
-  // Backend (APIs & Server)
-  getTenantIdFromHeaders,
-  getCurrentTenantId,
-  validateTenantAccess,
-} from "./server";
+// Note: Server-side tenant utilities are in /lib/server/tenant.ts

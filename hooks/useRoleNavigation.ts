@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useAuth } from "./useAuth";
-import { performRoleBasedRedirect, getRoleBasedRedirectUrl } from "@/lib/roleRedirect";
+import { performRoleBasedRedirect, getRoleBasedRedirectUrl } from "@/lib/tenant/roleRedirect";
 import { toast } from "sonner";
 import { getSubdomainFromHostname } from "@/lib";
 

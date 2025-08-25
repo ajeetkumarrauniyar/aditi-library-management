@@ -1,5 +1,5 @@
-import { resend } from "@/lib/server";
-import { shouldLogOTPToConsole } from "@/lib/utils";
+import { resend } from "@/lib/services";
+import { shouldLogOTPToConsole } from "@/lib/core/utils";
 
 export type VerificationType = "tenant_registration" | "user_registration";
 

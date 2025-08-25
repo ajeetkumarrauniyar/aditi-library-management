@@ -1,8 +1,13 @@
+/**
+ * Server-side tenant utilities
+ *
+ * Server-only tenant utilities for API routes and server components.
+ */
+
 import { headers } from "next/headers";
 
 /**
  * Get tenant ID from request headers (for APIs & server actions)
- * Use in: API routes, server actions, middleware
  */
 export function getTenantIdFromHeaders(requestHeaders: Headers): string {
   return requestHeaders.get("x-tenant-id") || "default";
@@ -10,7 +15,6 @@ export function getTenantIdFromHeaders(requestHeaders: Headers): string {
 
 /**
  * Get current tenant ID in server components/actions
- * Use in: Server components, server actions (auto-gets headers)
  */
 export async function getCurrentTenantId(): Promise<string> {
   const headersList = await headers();
@@ -19,7 +23,6 @@ export async function getCurrentTenantId(): Promise<string> {
 
 /**
  * Validate if user has access to tenant
- * Use in: API routes for security
  */
 export async function validateTenantAccess(
   requestHeaders: Headers,
@@ -27,4 +30,15 @@ export async function validateTenantAccess(
 ): Promise<boolean> {
   const currentTenantId = getTenantIdFromHeaders(requestHeaders);
   return currentTenantId === requiredTenantId;
+}
+
+/**
+ * Get tenant data from subdomain
+ */
+export async function getTenantBySubdomain(subdomain: string) {
+  const { default: prisma } = await import("../database/prisma");
+  const tenant = await prisma.tenant.findUnique({
+    where: { slug: subdomain },
+  });
+  return tenant;
 }

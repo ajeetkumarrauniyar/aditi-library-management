@@ -1,12 +1,13 @@
 import bcrypt from "bcryptjs";
-import { prisma, signJWT } from "@/lib/server";
+import { prisma } from "@/lib/database";
+import { signJWT } from "@/lib/auth/jwt";
 import {
   badRequestError,
   conflictError,
   notFoundError,
   unauthorizedError,
   successResponse,
-} from "@/lib/apiResponse";
+} from "@/lib/http/apiResponse";
 import {
   generateVerificationCode,
   generateVerificationCodeExpiry,

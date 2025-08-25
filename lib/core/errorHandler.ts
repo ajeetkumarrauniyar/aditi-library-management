@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ApiError, apiErrorResponse } from "./apiResponse";
+import { ApiError, apiErrorResponse } from "../http/apiResponse";
 
 interface PrismaError {
   code: string;

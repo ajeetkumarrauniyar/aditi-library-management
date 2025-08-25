@@ -1,10 +1,24 @@
-// Lib Barrel Export
+/**
+ * Main library exports - Client-Safe Only
+ *
+ * This module exports only client-safe utilities that can be used
+ * in browser environments. Server-only utilities must be imported directly.
+ */
+
+// Core utilities
+export * from "./core";
+
+// HTTP utilities
+export * from "./http";
+
+// Authentication (client-safe parts)
+export * from "./auth/jwt";
+export * from "./auth/auth";
+
+// Tenant utilities (client-safe only)
 export * from "./tenant";
-export * from "./apiResponse";
-export * from "./errorHandler";
-export * from "./asyncHandler";
-export * from "./utils";
-export * from "./jwt";
-export * from "./auth";
-export { default as prisma } from "./prisma";
-export { default as resend } from "./resend";
+
+// Note: Server-only utilities must be imported directly:
+// - Database: import { prisma } from "@/lib/database";
+// - Services: import { resend } from "@/lib/services";
+// - Server: import { getTenantBySubdomain } from "@/lib/server";
